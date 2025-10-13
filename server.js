@@ -15,7 +15,10 @@ const clientRouter = require('./router/individualRouter')
 app.use('/api/v1/', hallownerRouter)
 app.use('/api/v1/', clientRouter)
 app.use((error, req, res, next) => {
-  return res.status(error.status || 500).json(error.message || 'Something went wrong')
+  if (error) {
+     return res.status(error.status || 500).json(error.message || 'Something went wrong')
+  }
+ next()
 })
 
 const swaggerDefinition = {
