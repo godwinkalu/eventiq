@@ -2,7 +2,12 @@ const mongoose = require('mongoose')
 
 const hallOwnerSchema = new mongoose.Schema(
   {
-    fullname: {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    surname: {
       type: String,
       required: true,
       trim: true,
@@ -18,28 +23,11 @@ const hallOwnerSchema = new mongoose.Schema(
       required: true,
       trim: true,
       unique: true,
+      lowercase: true
     },
     phoneNumber: {
       type: String,
-      required: true,
       trim: true,
-    },
-    address: {
-      street: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      lga: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      state: {
-        type: String,
-        required: true,
-        trim: true,
-      },
     },
     password: {
       type: String,
@@ -49,11 +37,9 @@ const hallOwnerSchema = new mongoose.Schema(
     profilePicture: {
       url: {
         type: String,
-        required: true,
       },
       publicId: {
         type: String,
-        required: true,
       },
     },
     otp: {
@@ -74,9 +60,7 @@ const hallOwnerSchema = new mongoose.Schema(
     },
    role: {
       type: String,
-      required: true,
       default: 'hallOwners',
-      enum: ['hallOwners'],
     },
   },
   { timestamps: true }
