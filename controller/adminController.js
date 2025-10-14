@@ -14,8 +14,6 @@ exports.signUp = async (req,res, next) =>{
     const hashedPassword = await bcrypt.hash(password, salt)
 
     
-    .toString()
-    .padStart(6, '0');
 
     const response = await cloudinary.uploader.upload('https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/')
     
