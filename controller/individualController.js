@@ -8,7 +8,7 @@ exports.signUp = async (req,res, next) =>{
   const {firstName,surname,phoneNumber,email,password,role} = req.body
   try {
     const individual = await individualModel.findOne({email:email.toLowerCase()})
-    if (individual) {
+    if (!individual) {
       return res.status(404).json({
         message:'individual  already exists, log in to your account'
       })

@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
-const individualModel = require('../models/hallownerModel')
+const individualModel = require('../models/individualModel')
+const hallOwnerModel = require('../models/hallownerModel')
+const adminModel = require('../models/adminModel')
 
 exports.authentication = async (req, res, next) => {
   try {
@@ -14,8 +16,8 @@ exports.authentication = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-    const individual = await individualModel.findById(decoded.id)
-    if (!individual) {
+    const user = await individualModel.findById(decoded.id) || await hallOwnerModel.findById(decoded.id) || await adminModel.findById(decoded.id)
+    if (!user) {
       return res.status(404).json({
         message: 'Authentication failed, User not found',
       })
