@@ -1,19 +1,23 @@
 const hallownerModel = require('../models/hallownerModel')
 const individualModel = require('../models/individualModel')
 const adminModel = require('../models/adminModel')
+const jwt = require('jsonwebtoken')
+const { signUpTemplate } = require('../utils/emailTemplate')
+const { emailSender } = require('../middleware/nodemalier')
 
 exports.verify = async (req, res, next) => {
   const { email, otp } = req.body
-
   try {
     const user =
       (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
-      (await individualModel.findOne({ email: email.toLowerCase() })) 
+      (await individualModel.findOne({ email: email.toLowerCase() }))
+
     if (!user) {
       return res.status(404).json({
         message: 'User not found',
       })
     }
+
     if (Date.now() > user.otpExpiredat) {
       return res.status(400).json({
         message: 'Otp expired',
@@ -37,6 +41,7 @@ exports.verify = async (req, res, next) => {
       otp: null,
       otpExpiredat: null,
     })
+
     await user.save()
     res.status(404).json({
       message: 'User verified Successfully',
@@ -48,9 +53,11 @@ exports.verify = async (req, res, next) => {
 
 exports.resendOtp = async (req, res, next) => {
   const { email } = req.body
-
   try {
-    const user= await hallownerModel.findOne({ email: email.toLowerCase() }) || await individualModel.findOne({email:email.toLowerCase()})
+    const user =
+      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
+      (await individualModel.findOne({ email: email.toLowerCase() }))
+
     if (!user) {
       return res.status(404).json({
         message: 'user not found',
@@ -62,7 +69,6 @@ exports.resendOtp = async (req, res, next) => {
       .padStart(6, '0')
     user.otp = newOtp
     user.otpExpiredat = Date.now() + 2 * 60 * 1000
-
     await user.save()
 
     if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
@@ -86,44 +92,41 @@ exports.resendOtp = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   const { email, password } = req.body
-  if (!email) {
-    return res.status(400).json({
-      message: 'Email required',
-    })
-  }
-  if (!password) {
-    return res.status(400).json({
-      message: 'password required',
-    })
-  }
   try {
     const user =
       (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
       (await individualModel.findOne({ email: email.toLowerCase() })) ||
       (await adminModel.findOne({ email: email.toLowerCase() }))
+
     if (!user) {
       return res.status(404).json({
-        message: 'user not found',
+        message: 'Account not found',
       })
     }
 
-    const checkPassword = await bcrypt.compare(password, user.password)
-    if (!checkPassword) {
+    const correctPassword = await bcrypt.compare(password, user.password)
+
+    if (!correctPassword) {
       return res.status(400).json({
-        message: 'Incorrect password',
+        message: 'Invaild Credentials',
       })
     }
 
-    const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: '1hr',
-    })
+    user.isLoggedIn = true
+    const token = jwt.sign(
+      { id: user._id, isLoggedIn: user.isLoggedIn, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1d',
+      }
+    )
 
+    await user.save()
     res.status(200).json({
-      message: 'Login successfully',
-      token: token,
+      message: 'Logged in  successfully',
+      data: user,
+      token,
     })
-
-    // a mail could be sent showing that the user has logged in at the current time
   } catch (error) {
     next(error)
   }
@@ -138,6 +141,7 @@ exports.changePassword = async (req, res, next) => {
       (await hallownerModel.findById(id)) ||
       (await individualModel.findById(id)) ||
       (await adminModel.findById(id))
+
     if (!user) {
       return res.status(404).json({
         message: 'user not found',
@@ -159,10 +163,8 @@ exports.changePassword = async (req, res, next) => {
 
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(newPassword, salt)
-
     user.password = hashedPassword
     await user.save()
-
     return res.status(200).json({
       message: 'Password changed successfully',
     })
@@ -174,26 +176,34 @@ exports.changePassword = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body
   try {
-    const user = await hallownerModel.findOne({ email: email.toLowerCase() })
+    const user =
+      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
+      (await adminModel.findOne({ email: email.toLowerCase() })) ||
+      (await individualModel.findOne({ email: email.toLowerCase() }))
+
     if (!user) {
       return res.status(404).json({
         message: 'User not found',
       })
     }
 
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: '20m',
-    })
+    const newOtp = Math.floor(1000 + Math.random() * 1e6)
+      .toString()
+      .padStart(6, '0')
+    user.otp = newOtp
+    user.otpExpiredat = Date.now() + 2 * 60 * 1000
+    await user.save()
 
-    const link = `${req.protocol}://${req.get('host')}/users/reset/password/${token}`
+    if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
+      const emailOptions = {
+        email: user.email,
+        subject: 'Reset Password',
+        html: signUpTemplate(otp, user.firstName),
+      }
 
-    const emailOptions = {
-      email: user.email,
-      subject: 'Reset password',
-      html: forgotPasswordTemplate(link, user.firstName),
+      emailSender(emailOptions)
+    } else {
     }
-
-    emailSender(emailOptions)
 
     return res.status(200).json({
       message: 'forgot password request sent',
@@ -204,13 +214,13 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.resetPassword = async (req, res, next) => {
-  const { token } = req.params
-  const { newPassword, confirmPassword } = req.body
-
+  const { email, newPassword, confirmPassword } = req.body
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const user =
+      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
+      (await adminModel.findOne({ email: email.toLowerCase() })) ||
+      (await individualModel.findOne({ email: email.toLowerCase() }))
 
-    const user = await hallownerModel.findById(decoded.id)
     if (!user) {
       return res.status(404).json({
         message: 'user not found',
@@ -222,22 +232,11 @@ exports.resetPassword = async (req, res, next) => {
         message: 'Password mismatch',
       })
     }
+
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(newPassword, salt)
-
-    const tokenExpiry = Date.now() + 5 * 60 * 1000
-
-    if (Date.now() > tokenExpiry) {
-      return res.status(400).json({
-        message: 'Password expired, resend a password',
-      })
-    }
-
     user.password = hashedPassword
-    user.resetPasswordExpiriedAt = tokenExpiry
-
     await user.save()
-
     return res.status(404).json({
       message: 'Password reset successfully',
     })

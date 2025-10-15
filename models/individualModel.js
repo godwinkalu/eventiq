@@ -61,4 +61,5 @@ const individualSchema = new mongoose.Schema(
 )
 
 const individualModel = mongoose.model('individuals', individualSchema)
+
 module.exports = individualModel

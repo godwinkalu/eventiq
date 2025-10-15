@@ -1,16 +1,18 @@
 const individualModel = require('../models/individualModel')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 const emailSender = require('../middleware/nodemalier')
+const cloudinary = require('../config/cloudinary')
+const { signUpTemplate } = require('../utils/emailTemplate')
 
 
-exports.signUp = async (req,res, next) =>{
-  const {firstName,surname,phoneNumber,email,password,role} = req.body
+exports.signUp = async (req, res, next) => {
+  const { firstName, surname, phoneNumber, email, password } = req.body
   try {
-    const individual = await individualModel.findOne({email:email.toLowerCase()})
-    if (!individual) {
+    const individual = await individualModel.findOne({ email: email.toLowerCase() })
+
+    if (individual) {
       return res.status(404).json({
-        message:'individual  already exists, log in to your account'
+        message: 'Account already exists, log in to your account',
       })
     }
 
@@ -18,11 +20,13 @@ exports.signUp = async (req,res, next) =>{
     const hashedPassword = await bcrypt.hash(password, salt)
 
     const otp = Math.round(Math.random() * 1e6)
-    .toString()
-    .padStart(6, '0')
+      .toString()
+      .padStart(6, '0')
 
-    const response = await cloudinary.uploader.upload('https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/')
-    
+    const imgUrl =
+      'https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=';
+
+    const response = await cloudinary.uploader.upload(imgUrl)
 
     const newindividual = new individualModel({
       firstName,
@@ -32,25 +36,28 @@ exports.signUp = async (req,res, next) =>{
       password: hashedPassword,
       otp: otp,
       otpExpiredat: Date.now() + 1000 * 60,
-       profilePicture: {
+      profilePicture: {
         url: response.secure_url,
-        publicId: response.public_id
-      }
+        publicId: response.public_id,
+      },
     })
-    const savedindividual = await newindividual.save()
 
-   
-    const emailOptions = {
-      email: newindividual.email,
-      subject: 'sign up successful',
-      html: signUpTemplate(otp,individual.firstName),
+    if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
+      const emailOptions = {
+        email: newhallOwner.email,
+        subject: 'Verify Email',
+        html: signUpTemplate(otp, newhallOwner.firstName),
+      }
+
+      emailSender(emailOptions)
+    } else {
     }
 
-    emailSender(emailOptions)
+    await newindividual.save()
 
     return res.status(201).json({
-      message:'individual created successfully',
-      data: savedindividual
+      message: 'individual created successfully',
+      data: newindividual,
     })
   } catch (error) {
     next(error)

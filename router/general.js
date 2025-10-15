@@ -1,19 +1,12 @@
 const router = require('express').Router()
-const {
-  verify,
-  resendOtp,
-  changePassword,
-  forgotPassword,
-  resetPassword,
-  loginhallOwner,
-} = require('../controller/hallownerController')
+const { verify, resendOtp, login, changePassword, forgotPassword, resetPassword } = require('../controller/general')
 const { authentication } = require('../middleware/authMiddleware')
-router.post('/hallowner/verify/:token', verify)
-router.post('/hallowner/resendOtp', resendOtp)
-router.post('/hallowner/login', loginhallOwner)
-router.post('/hallowner/changePassword', authentication, changePassword)
-router.post('/hallowner/forgotPassword', forgotPassword)
-router.post('/hallowner/resetPassword/:token', resetPassword)
 
+router.post('/verify', verify)
+router.post('/resendOtp', resendOtp)
+router.post('/login', login)
+router.post('/changePassword', authentication,changePassword)
+router.post('/forgotPassword', forgotPassword)
+router.post('/resetPassword', resetPassword)
 
 module.exports = router
