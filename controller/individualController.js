@@ -1,8 +1,10 @@
 const individualModel = require('../models/individualModel')
 const bcrypt = require('bcrypt')
-const emailSender = require('../middleware/nodemalier')
+const jwt = require('jsonwebtoken')
 const cloudinary = require('../config/cloudinary')
 const { signUpTemplate } = require('../utils/emailTemplate')
+const { emailSender } = require('../middleware/nodemalier')
+
 
 
 exports.signUp = async (req, res, next) => {
@@ -44,16 +46,14 @@ exports.signUp = async (req, res, next) => {
 
     if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
       const emailOptions = {
-        email: newhallOwner.email,
-        subject: 'Verify Email',
-        html: signUpTemplate(otp, newhallOwner.firstName),
+        email: newindividual.email,
+        subject: 'Sign up successful',
+        html: signUpTemplate(otp, newindividual.firstName),
       }
-
-      emailSender(emailOptions)
+    await emailSender(emailOptions)
     } else {
-    }
-
-    await newindividual.save()
+    } 
+     await newindividual.save()
 
     return res.status(201).json({
       message: 'individual created successfully',

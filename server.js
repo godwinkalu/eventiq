@@ -16,7 +16,7 @@ const generalRouter = require('./router/general')
 
 app.use('/api/v1/', hallownerRouter)
 app.use('/api/v1/', individualRouter)
-app.use(adminRouter)
+app.use('/api/v1/',adminRouter)
 app.use(generalRouter)
 app.use((error, req, res, next) => {
   if (error) {

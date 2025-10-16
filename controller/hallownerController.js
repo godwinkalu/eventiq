@@ -1,8 +1,8 @@
 const hallownerModel = require('../models/hallownerModel')
 const cloudinary = require('../config/cloudinary')
 const bcrypt = require('bcrypt')
-const emailSender = require('../middleware/nodemalier')
 const { signUpTemplate } = require('../utils/emailTemplate')
+const { emailSender } = require('../middleware/nodemalier')
 
 exports.createhallOwner = async (req, res, next) => {
   const { firstName, surname, businessName, email, password, phoneNumber } = req.body
@@ -48,7 +48,7 @@ exports.createhallOwner = async (req, res, next) => {
         html: signUpTemplate(otp, newhallOwner.firstName),
       }
 
-      emailSender(emailOptions)
+    await emailSender(emailOptions)
     } else {
 
     }
