@@ -14,7 +14,6 @@ exports.createhallOwner = async (req, res, next) => {
         message: 'Account already exists, login your account',
       })
     }
-
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
