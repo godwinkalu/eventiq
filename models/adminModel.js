@@ -27,17 +27,9 @@ const adminSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    profilePicture: {
-      url: {
-        type: String,
-      },
-      publicId: {
-        type: String,
-      },
-    },
     isVerified: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     isLoggedIn: {
       type: Boolean,

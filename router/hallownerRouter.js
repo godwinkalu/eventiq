@@ -1,10 +1,6 @@
-const express = require('express')
-const {
-  signUp,
- 
-} = require('../controller/hallownerController')
-const { authentication } = require('../middleware/authMiddleware')
-const router = express.Router()
+const { createhallOwner } = require("../controller/hallownerController")
+
+const router = require('express').Router()
 
 /**
  * @swagger
@@ -100,6 +96,6 @@ const router = express.Router()
  *       500:
  *         description: Server error
  */
-router.post('/hallowner', signUp)
+router.post('/hallowner', createhallOwner)
 
 module.exports = router

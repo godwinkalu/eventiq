@@ -1,17 +1,17 @@
 const hallownerModel = require('../models/hallownerModel')
 const cloudinary = require('../config/cloudinary')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const emailSender = require('../middleware/nodemalier')
 const { signUpTemplate } = require('../utils/emailTemplate')
+const { emailSender } = require('../middleware/nodemalier')
 
-exports.signUp = async (req, res, next) => {
+exports.createhallOwner = async (req, res, next) => {
   const { firstName, surname, businessName, email, password, phoneNumber } = req.body
   try {
     const hallOwner = await hallownerModel.findOne({ email: email.toLowerCase() })
+
     if (hallOwner) {
       return res.status(404).json({
-        message: 'hallOwner already exists, log in to your account',
+        message: 'Account already exists, login your account',
       })
     }
 
@@ -22,7 +22,9 @@ exports.signUp = async (req, res, next) => {
       .toString()
       .padStart(6, '0')
 
-    const response = await cloudinary.uploader.upload('https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/')
+    const imgUrl = 'https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8='
+
+    const response = await cloudinary.uploader.upload(imgUrl)
 
     const newhallOwner = new hallownerModel({
       firstName,
@@ -35,28 +37,26 @@ exports.signUp = async (req, res, next) => {
       otpExpiredat: Date.now() + 1000 * 60,
       profilePicture: {
         url: response.secure_url,
-        publicId: response.public_id
-      }
+        publicId: response.public_id,
+      },
     })
-    const savedhallOwner = await newhallOwner.save()
 
     if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
-      console.log('passed');
-      
       const emailOptions = {
         email: newhallOwner.email,
         subject: 'Verify Email',
         html: signUpTemplate(otp, newhallOwner.firstName),
       }
 
-      emailSender(emailOptions)
+    await emailSender(emailOptions)
     } else {
+
     }
 
-    await newhallOwner.save()
+   await newhallOwner.save()
     res.status(201).json({
       message: 'hallOwner created successfully',
-      data: savedhallOwner,
+      data: newhallOwner,
     })
   } catch (error) {
     next(error)

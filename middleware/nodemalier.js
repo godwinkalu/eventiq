@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer')
 
-const emailSender = async (options) => {
+exports.emailSender = async (options) => {
 
   // Create a test account or replace with real credentials.
   const transporter = nodemailer.createTransport({
@@ -18,12 +18,12 @@ const emailSender = async (options) => {
   (async () => {
     try {
       const info = await transporter.sendMail({
-        from: `EVENTIQ <noreply@gmail.com>`,
+        from: `${process.env.APP_USER}`,
         to: options.email,
         subject: options.subject,
         html: options.html,
-        text: 'This is an automated message. Please do not reply to this email',
-        replyTo: 'no-reply@nowhere.com'
+        // text: 'This is an automated message. Please do not reply to this email',
+        // replyTo: 'no-reply@nowhere.com'
       });
 
       console.log("Message has been sent to:", options.email);
@@ -32,5 +32,3 @@ const emailSender = async (options) => {
     }
   })();
 }
-
-module.exports = emailSender
