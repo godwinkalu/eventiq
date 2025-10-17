@@ -74,7 +74,7 @@ export const signUpTemplate=(otp,firstName)=>{
                 <p>Hello ${firstName},</p>
                 <p>Welcome to Eventiq — we’re so glad you’re here! To get started and secure your account, please use the One-Time Password (OTP).</p>
                 <p>This code will expire in 1 minutes, so be sure to enter it soon.</p>
-                <div class="button-container">
+                <div class="button">
                     ${otp}</a>
                 </div>
                 <p>If you did not sign up on our platform, kindly ignore this email.</p>

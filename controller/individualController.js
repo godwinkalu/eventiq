@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const cloudinary = require('../config/cloudinary')
 const { signUpTemplate } = require('../utils/emailTemplate')
 const { emailSender } = require('../middleware/nodemalier')
+const Brevo = require('@getbrevo/brevo')
 
 
 
@@ -43,16 +44,21 @@ exports.signUp = async (req, res, next) => {
         publicId: response.public_id,
       },
     })
+  console.log(firstName)
 
-    if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
-      const emailOptions = {
-        email: newindividual.email,
-        subject: 'Sign up successful',
-        html: signUpTemplate(otp, newindividual.firstName),
-      }
-    await emailSender(emailOptions)
-    } else {
-    } 
+   const apikey =process.env.brevo
+ const apiInstance = new Brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apikey);
+
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.subject =  "Welcome to Eventiq";
+    sendSmtpEmail.to = [{ email:newindividual.email }];
+    sendSmtpEmail.sender = { name: "Eventiq", email: "udumag51@gmail.com" };
+
+    sendSmtpEmail.htmlContent =  signUpTemplate(otp,newindividual.firstName);
+  console.log(firstName)
+
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
      await newindividual.save()
 
     return res.status(201).json({
