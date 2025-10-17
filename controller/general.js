@@ -17,7 +17,10 @@ exports.verify = async (req, res, next) => {
         message: 'User not found',
       })
     }
-
+     console.log("User:",user);
+     console.log("User  Date:  ",user.otpExpiredat);
+     console.log("Date:  ",Date.now()+ 1000 * 60);
+     
     if (Date.now() > user.otpExpiredat) {
       return res.status(400).json({
         message: 'Otp expired',
