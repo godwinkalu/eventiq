@@ -3,6 +3,7 @@ const cloudinary = require('../config/cloudinary')
 const bcrypt = require('bcrypt')
 const { signUpTemplate } = require('../utils/emailTemplate')
 const { emailSender } = require('../middleware/nodemalier')
+const Brevo = require('@getbrevo/brevo')
 
 exports.createhallOwner = async (req, res, next) => {
   const { firstName, surname, businessName, email, password, phoneNumber } = req.body
