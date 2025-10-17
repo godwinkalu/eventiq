@@ -40,17 +40,20 @@ exports.createhallOwner = async (req, res, next) => {
       },
     })
 
-    if (`${req.protocol}://${req.get('host')}`.startsWith('http://localhost')) {
-      const emailOptions = {
-        email: newhallOwner.email,
-        subject: 'Verify Email',
-        html: signUpTemplate(otp, newhallOwner.firstName),
-      }
-
-    await emailSender(emailOptions)
-    } else {
-
-    }
+    const apikey =process.env.brevo
+     const apiInstance = new Brevo.TransactionalEmailsApi();
+        apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apikey);
+    
+        const sendSmtpEmail = new Brevo.SendSmtpEmail();
+        sendSmtpEmail.subject =  "Welcome to Eventiq";
+        sendSmtpEmail.to = [{ email:newhallOwner.email }];
+        sendSmtpEmail.sender = { name: "Eventiq", email: "udumag51@gmail.com" };
+    
+        sendSmtpEmail.htmlContent =  signUpTemplate(otp,newhallOwner.firstName);
+      console.log(firstName)
+    
+        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+         await newhallOwner.save()
 
    await newhallOwner.save()
     res.status(201).json({
