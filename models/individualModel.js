@@ -38,23 +38,21 @@ const individualSchema = new mongoose.Schema(
     },
     otp: {
       type: String,
-      required: true,
+      
     },
     otpExpiredat: {
-      type: String,
-      required: true,
+      type: Number,
+    
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
-    isLoggedIn: {
-      type: Boolean,
-      default: false,
-    },
+
     role: {
       type: String,
-      default: 'indivudual',
+      enum:['individual',  'admin'],
+      default: 'individual', 
     },
   },
   { timestamps: true }
