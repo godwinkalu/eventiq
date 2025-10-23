@@ -4,6 +4,7 @@ const adminModel = require('../models/adminModel')
 const jwt = require('jsonwebtoken')
 const { signUpTemplate } = require('../utils/emailTemplate')
 const { emailSender } = require('../middleware/nodemalier')
+const bcrypt = require('bcrypt')
 
 exports.verify = async (req, res, next) => {
   const { email, otp } = req.body
@@ -17,9 +18,6 @@ exports.verify = async (req, res, next) => {
         message: 'User not found',
       })
     }
-     console.log("User:",user);
-     console.log("User  Date:  ",user.otpExpiredat);
-     console.log("Date:  ",Date.now()+ 1000 * 60);
      
     if (Date.now() > user.otpExpiredat) {
       return res.status(400).json({
@@ -78,7 +76,7 @@ exports.resendOtp = async (req, res, next) => {
       const emailOptions = {
         email: user.email,
         subject: 'Verify Email',
-        html: signUpTemplate(otp, user.firstName),
+        html: signUpTemplate(newOtp, user.firstName),
       }
 
       emailSender(emailOptions)
@@ -166,6 +164,8 @@ exports.changePassword = async (req, res, next) => {
 
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+    
     user.password = hashedPassword
     await user.save()
     return res.status(200).json({
@@ -201,7 +201,7 @@ exports.forgotPassword = async (req, res, next) => {
       const emailOptions = {
         email: user.email,
         subject: 'Reset Password',
-        html: signUpTemplate(otp, user.firstName),
+        html: signUpTemplate(newOtp, user.firstName),
       }
 
       emailSender(emailOptions)

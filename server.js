@@ -13,11 +13,16 @@ const hallownerRouter = require('./router/hallownerRouter')
 const individualRouter = require('./router/individualRouter');
 const adminRouter = require('./router/adminRouter')
 const generalRouter = require('./router/general')
+const hallbookingRouter = require('./router/hallbookingRouter')
+const hallRouter  = require('./router/hallRouter')
 
 app.use('/api/v1/', hallownerRouter)
 app.use('/api/v1/', individualRouter)
 app.use('/api/v1/',adminRouter)
-app.use(generalRouter)
+app.use('/api/v1/',generalRouter)
+app.use('/api/v1/', hallbookingRouter)
+app.use('/api/v1/',hallRouter)
+
 app.use((error, req, res, next) => {
   if (error) {
      return res.status(error.status || 500).json(error.message || 'Something went wrong')

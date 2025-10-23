@@ -44,22 +44,24 @@ const hallOwnerSchema = new mongoose.Schema(
     },
     otp: {
       type: String,
-      required: true,
+      
     },
     otpExpiredat: {
-      type: String,
-      required: true,
+      type: Number,
+      
+    },
+    hallId:{
+      type:mongoose.Schema.Types.ObjectId,
+          ref:'hallOwners',
+          required:true  
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
-    isLoggedIn: {
-      type: Boolean,
-      default: false,
-    },
    role: {
       type: String,
+      enum:[ 'hallOwners', 'admin'],
       default: 'hallOwners',
     },
   },
