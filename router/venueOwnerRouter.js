@@ -1,10 +1,10 @@
-const { createhallOwner } = require("../controller/hallownerController")
+const { createVenueOwner } = require("../controller/venueOwnerController")
 
 const router = require('express').Router()
 
 /**
  * @swagger
- * /api/v1/hallowner:
+ * /api/v1/venue-owner:
  *   post:
  *     summary: Register a new hall owner
  *     description: Creates a new hall owner account and sends a verification OTP to the provided email.
@@ -96,6 +96,6 @@ const router = require('express').Router()
  *       500:
  *         description: Server error
  */
-router.post('/hallowner', createhallOwner)
+router.post('/venueOwner', createVenueOwner)
 
 module.exports = router
