@@ -1,4 +1,4 @@
-const individualModel = require('../models/individualModel')
+const clientModel = require('../models/clientModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cloudinary = require('../config/cloudinary')
@@ -6,14 +6,12 @@ const { signUpTemplate } = require('../utils/emailTemplate')
 const { emailSender } = require('../middleware/nodemalier')
 const Brevo = require('@getbrevo/brevo')
 
-
-
 exports.signUp = async (req, res, next) => {
   const { firstName, surname, phoneNumber, email, password } = req.body
   try {
-    const individual = await individualModel.findOne({ email: email.toLowerCase() })
+    const existClient = await clientModel.findOne({ email: email.toLowerCase() })
 
-    if (individual) {
+    if (existClient) {
       return res.status(404).json({
         message: 'Account already exists, log in to your account',
       })
@@ -27,11 +25,11 @@ exports.signUp = async (req, res, next) => {
       .padStart(6, '0')
 
     const imgUrl =
-      'https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=';
+      'https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8='
 
     const response = await cloudinary.uploader.upload(imgUrl)
 
-    const newindividual = new individualModel({
+    const client = new clientModel({
       firstName,
       surname,
       phoneNumber,
@@ -44,26 +42,24 @@ exports.signUp = async (req, res, next) => {
         publicId: response.public_id,
       },
     })
-  console.log(firstName)
 
-   const apikey =process.env.brevo
- const apiInstance = new Brevo.TransactionalEmailsApi();
-    apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apikey);
+    const apikey = process.env.brevo
+    const apiInstance = new Brevo.TransactionalEmailsApi()
+    apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apikey)
 
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
-    sendSmtpEmail.subject =  "Welcome to Eventiq";
-    sendSmtpEmail.to = [{ email:newindividual.email }];
-    sendSmtpEmail.sender = { name: "Eventiq", email: "udumag51@gmail.com" };
+    const sendSmtpEmail = new Brevo.SendSmtpEmail()
+    sendSmtpEmail.subject = 'Welcome to Eventiq'
+    sendSmtpEmail.to = [{ email: client.email }]
+    sendSmtpEmail.sender = { name: 'Eventiq', email: 'udumag51@gmail.com' }
 
-    sendSmtpEmail.htmlContent =  signUpTemplate(otp,newindividual.firstName);
-  console.log(firstName)
+    sendSmtpEmail.htmlContent = signUpTemplate(otp, client.firstName)
+    console.log(firstName)
 
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-     await newindividual.save()
-
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
+    await client.save()
     return res.status(201).json({
-      message: 'individual created successfully',
-      data: newindividual,
+      message: 'Client created successfully',
+      data: client,
     })
   } catch (error) {
     next(error)

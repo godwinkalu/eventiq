@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const individualSchema = new mongoose.Schema(
+const venueOwnerSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -12,15 +12,21 @@ const individualSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    email: {
+    businessName: {
       type: String,
       required: true,
       trim: true,
       unique: true,
     },
-    phoneNumber: {
+    email: {
       type: String,
       required: true,
+      trim: true,
+      unique: true,
+      lowercase: true
+    },
+    phoneNumber: {
+      type: String,
       trim: true,
     },
     password: {
@@ -42,22 +48,20 @@ const individualSchema = new mongoose.Schema(
     },
     otpExpiredat: {
       type: Number,
-    
+      
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
-
-    role: {
+   role: {
       type: String,
-      enum:['individual',  'admin'],
-      default: 'individual', 
+      default: 'venue-owner'
     },
   },
   { timestamps: true }
 )
 
-const individualModel = mongoose.model('individuals', individualSchema)
+const venueOwnerModel = mongoose.model('venueOwners', venueOwnerSchema)
 
-module.exports = individualModel
+module.exports = venueOwnerModel

@@ -1,24 +1,25 @@
-const hallownerModel = require('../models/hallownerModel')
-const individualModel = require('../models/individualModel')
+const venueOwnerModel = require('../models/venueOwnerModel')
+const clientModel = require('../models/clientModel')
 const adminModel = require('../models/adminModel')
 const jwt = require('jsonwebtoken')
 const { signUpTemplate } = require('../utils/emailTemplate')
 const { emailSender } = require('../middleware/nodemalier')
 const bcrypt = require('bcrypt')
 
+
 exports.verify = async (req, res, next) => {
   const { email, otp } = req.body
   try {
     const user =
-      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
-      (await individualModel.findOne({ email: email.toLowerCase() }))
+      (await venueOwnerModel.findOne({ email: email.toLowerCase() })) ||
+      (await clientModel.findOne({ email: email.toLowerCase() }))
 
     if (!user) {
       return res.status(404).json({
         message: 'User not found',
       })
     }
-     
+
     if (Date.now() > user.otpExpiredat) {
       return res.status(400).json({
         message: 'Otp expired',
@@ -56,8 +57,8 @@ exports.resendOtp = async (req, res, next) => {
   const { email } = req.body
   try {
     const user =
-      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
-      (await individualModel.findOne({ email: email.toLowerCase() }))
+      (await venueOwnerModel.findOne({ email: email.toLowerCase() })) ||
+      (await clientModel.findOne({ email: email.toLowerCase() }))
 
     if (!user) {
       return res.status(404).json({
@@ -95,8 +96,8 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body
   try {
     const user =
-      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
-      (await individualModel.findOne({ email: email.toLowerCase() })) ||
+      (await venueOwnerModel.findOne({ email: email.toLowerCase() })) ||
+      (await clientModel.findOne({ email: email.toLowerCase() })) ||
       (await adminModel.findOne({ email: email.toLowerCase() }))
 
     if (!user) {
@@ -139,8 +140,8 @@ exports.changePassword = async (req, res, next) => {
 
   try {
     const user =
-      (await hallownerModel.findById(id)) ||
-      (await individualModel.findById(id)) ||
+      (await venueOwnerModel.findById(id)) ||
+      (await clientModel.findById(id)) ||
       (await adminModel.findById(id))
 
     if (!user) {
@@ -165,7 +166,6 @@ exports.changePassword = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(newPassword, salt)
 
-    
     user.password = hashedPassword
     await user.save()
     return res.status(200).json({
@@ -180,9 +180,9 @@ exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body
   try {
     const user =
-      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
+      (await venueOwnerModel.findOne({ email: email.toLowerCase() })) ||
       (await adminModel.findOne({ email: email.toLowerCase() })) ||
-      (await individualModel.findOne({ email: email.toLowerCase() }))
+      (await clientModel.findOne({ email: email.toLowerCase() }))
 
     if (!user) {
       return res.status(404).json({
@@ -220,9 +220,9 @@ exports.resetPassword = async (req, res, next) => {
   const { email, newPassword, confirmPassword } = req.body
   try {
     const user =
-      (await hallownerModel.findOne({ email: email.toLowerCase() })) ||
+      (await venueOwnerModel.findOne({ email: email.toLowerCase() })) ||
       (await adminModel.findOne({ email: email.toLowerCase() })) ||
-      (await individualModel.findOne({ email: email.toLowerCase() }))
+      (await clientModel.findOne({ email: email.toLowerCase() }))
 
     if (!user) {
       return res.status(404).json({
