@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const hallOwnerSchema = new mongoose.Schema(
+const clientSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -12,21 +12,15 @@ const hallOwnerSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    businessName: {
-      type: String,
-      required: true,
-      trim: true,
-      unique: true,
-    },
     email: {
       type: String,
       required: true,
       trim: true,
       unique: true,
-      lowercase: true
     },
     phoneNumber: {
       type: String,
+      required: true,
       trim: true,
     },
     password: {
@@ -48,26 +42,22 @@ const hallOwnerSchema = new mongoose.Schema(
     },
     otpExpiredat: {
       type: Number,
-      
-    },
-    hallId:{
-      type:mongoose.Schema.Types.ObjectId,
-          ref:'hallOwners',
-          required:true  
+    
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
-   role: {
+
+    role: {
       type: String,
-      enum:[ 'hallOwners', 'admin'],
-      default: 'hallOwners',
+      enum:['client',  'admin'],
+      default: 'client', 
     },
   },
   { timestamps: true }
 )
 
-const hallOwnerModel = mongoose.model('hallOwners', hallOwnerSchema)
+const clientModel = mongoose.model('clients', clientSchema)
 
-module.exports = hallOwnerModel
+module.exports = clientModel

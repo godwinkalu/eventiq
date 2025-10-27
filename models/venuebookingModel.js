@@ -1,23 +1,23 @@
 const  mongoose  = require('mongoose')
 
-const hallbookingSchema =  new mongoose.Schema({
-  hallId:{
+const venuebookingSchema =  new mongoose.Schema({
+  venueId:{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'hall',
+    ref: 'venues',
     required: true
   },
-  individualId:{
+  clientId:{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'individual',
+    ref: 'clients',
     required: true
   },
-  hallOwnerId:{
+  venueOwnerId:{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'individual',
+    ref: 'venueOwners',
     required: true
   },
-   Date:{
-    type: Date,
+   date:{
+    type: String,
     required:true
   },
    totalamount:{
@@ -28,6 +28,11 @@ const hallbookingSchema =  new mongoose.Schema({
   type: Number,
   default: 0
 },
+   cautionfeestatus: {
+   type: String,
+    enum: ['pending', 'refunded'],
+    default: 'pending',
+  },
   paymentreference:{
     type: String,
     default: false
@@ -53,6 +58,6 @@ const hallbookingSchema =  new mongoose.Schema({
  
 },{timestamps:true})
 
-const hallbookingModel = mongoose.model('hallbooking', hallbookingSchema)
+const venuebookingModel = mongoose.model('venuebooking', venuebookingSchema)
 
-module.exports = hallbookingModel
+module.exports = venuebookingModel

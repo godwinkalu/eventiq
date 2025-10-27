@@ -9,19 +9,19 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
-const hallownerRouter = require('./router/hallownerRouter')
-const individualRouter = require('./router/individualRouter');
+const clientRouter = require('./router/clientRouter');
 const adminRouter = require('./router/adminRouter')
 const generalRouter = require('./router/general')
-const hallbookingRouter = require('./router/hallbookingRouter')
-const hallRouter  = require('./router/hallRouter')
+const venueRouter  = require('./router/venueRouter')
+const venueOwnerRouter  = require('./router/venueOwnerRouter')
+const venuebookingRouter =  require('./router/venuebookingRouter')
 
-app.use('/api/v1/', hallownerRouter)
-app.use('/api/v1/', individualRouter)
+app.use('/api/v1/', clientRouter)
 app.use('/api/v1/',adminRouter)
 app.use('/api/v1/',generalRouter)
-app.use('/api/v1/', hallbookingRouter)
-app.use('/api/v1/',hallRouter)
+app.use('/api/v1/',venueRouter)
+app.use('/api/v1/',venueOwnerRouter)
+app.use('/api/v1/',venuebookingRouter)
 
 app.use((error, req, res, next) => {
   if (error) {
