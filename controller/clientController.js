@@ -53,7 +53,6 @@ exports.signUp = async (req, res, next) => {
     sendSmtpEmail.sender = { name: 'Eventiq', email: 'udumag51@gmail.com' }
 
     sendSmtpEmail.htmlContent = signUpTemplate(otp, client.firstName)
-    console.log(firstName)
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
     await client.save()
