@@ -1,11 +1,16 @@
 const express = require('express')
-const { getMyBookings, getOwnerBookings, createvenuebooking,  } = require('../controller/venuebookingcontroller')
-const {authentication} = require('../middleware/authMiddleware')
+const {
+  getMyBookings,
+  getAllPendingBookings,
+  createvenuebooking,
+  getAllConfirmedBookings,
+} = require('../controller/venuebookingcontroller')
+const { authentication } = require('../middleware/authMiddleware')
 const router = express.Router()
 
-router.post('/booking/:venueId',authentication, createvenuebooking)
+router.post('/booking/:venueId', authentication, createvenuebooking)
 router.get('/mybooking', authentication, getMyBookings)
-router.get('/ownerbooking',authentication, getOwnerBookings)
-
+router.get('/pendingbooking', authentication, getAllPendingBookings)
+router.get('/confirmedbooking', authentication, getAllConfirmedBookings)
 
 module.exports = router

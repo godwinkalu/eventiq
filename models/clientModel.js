@@ -28,6 +28,19 @@ const clientSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+     bookings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'VenueBooking', // or 'HallBooking' depending on your model
+    },
+  ],
+   notifications: [
+    {
+      title: { type: String, required: true },
+      message: { type: String, required: true },
+      isRead: { type: Boolean, default: false },
+          },
+  ],
     profilePicture: {
       url: {
         type: String,
