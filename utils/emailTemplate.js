@@ -1,4 +1,4 @@
-export const signUpTemplate=(otp,firstName)=>{
+exports.signUpTemplate=(otp,firstName)=>{
     return `
     <!DOCTYPE html>
     <html lang="en">
