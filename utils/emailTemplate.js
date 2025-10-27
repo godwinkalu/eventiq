@@ -90,8 +90,7 @@ exports.signUpTemplate=(otp,firstName)=>{
   
     `
 }
-
-export const resendOtpTemplate = (newOtp, firstName) => {
+exports.resendOtpTemplate = (newOtp, firstName) => {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -186,7 +185,7 @@ export const resendOtpTemplate = (newOtp, firstName) => {
 }
 
 
-export const forgotPasswordTemplate = (verifyLink, firstName) => {
+exports.forgotPasswordTemplate = (verifyLink, firstName) => {
   return `
     <!DOCTYPE html>
     <html lang="en">
