@@ -66,3 +66,99 @@ exports.createVenueOwner = async (req, res, next) => {
     next(error)
   }
 }
+exports.getAllVenueOwners = async (req, res, next) => {
+  try {
+    const owners = await venueOwnerModel.find().select('-password -otp'); 
+    res.status(200).json({
+      message: 'All venue owners retrieved successfully',
+      data: owners,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getVenueOwnerById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const owner = await venueOwnerModel.findById(id).select('-password -otp');
+    if (!owner) {
+      return res.status(404).json({
+        message: 'Venue owner not found',
+      });
+    }
+
+    res.status(200).json({
+      message: 'Venue owner retrieved successfully',
+      data: owner,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateVenueOwner = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const owner = await venueOwnerModel.findById(id);
+    if (!owner) {
+      return res.status(404).json({
+        message: 'Venue owner not found',
+      });
+    }
+
+    let profilePicture = owner.profilePicture;
+    if (req.file) {
+  
+      if (owner.profilePicture && owner.profilePicture.publicId) {
+        await cloudinary.uploader.destroy(owner.profilePicture.publicId);
+      }
+
+      const uploadResponse = await cloudinary.uploader.upload(req.file.path);
+      profilePicture = {
+        url: uploadResponse.secure_url,
+        publicId: uploadResponse.public_id,
+      };
+    }
+
+    const { password, ...updates } = req.body;
+    updates.profilePicture = profilePicture;
+
+    const updatedOwner = await venueOwnerModel.findByIdAndUpdate(id, updates, {
+      new: true,
+    }).select('-password -otp');
+
+    res.status(200).json({
+      message: 'Venue owner updated successfully',
+      data: updatedOwner,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteVenueOwner = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const owner = await venueOwnerModel.findById(id);
+
+    if (!owner) {
+      return res.status(404).json({
+        message: 'Venue owner not found',
+      });
+    }
+
+    if (owner.profilePicture && owner.profilePicture.publicId) {
+      await cloudinary.uploader.destroy(owner.profilePicture.publicId);
+    }
+
+    await venueOwnerModel.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: 'Venue owner deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -11,7 +11,7 @@ const { authentication } = require('../middleware/authMiddleware')
 
 /**
  * @swagger
- * /auth/verify:
+ * /verify:
  *   post:
  *     summary: Verify user account using OTP
  *     tags: [Authentication]
@@ -45,7 +45,7 @@ router.post('/verify', verify)
 
 /**
  * @swagger
- * /auth/resendOtp:
+ * /resendOtp:
  *   post:
  *     summary: Resend verification OTP
  *     tags: [Authentication]
@@ -73,7 +73,7 @@ router.post('/resendOtp', resendOtp)
 
 /**
  * @swagger
- * /auth/login:
+ * /login:
  *   post:
  *     summary: Log in as Client, Venue Owner, or Admin
  *     tags: [Authentication]
@@ -107,7 +107,7 @@ router.post('/login', login)
 
 /**
  * @swagger
- * /auth/changePassword:
+ * /changePassword:
  *   post:
  *     summary: Change account password
  *     tags: [Authentication]
@@ -149,7 +149,7 @@ router.post('/changePassword', authentication,changePassword)
 
 /**
  * @swagger
- * /auth/forgotPassword:
+ * /forgotPassword:
  *   post:
  *     summary: Request password reset OTP
  *     tags: [Authentication]
@@ -178,7 +178,7 @@ router.post('/forgotPassword', forgotPassword)
 
 /**
  * @swagger
- * /auth/resetPassword:
+ * /resetPassword:
  *   post:
  *     summary: Reset account password
  *     tags: [Authentication]

@@ -50,12 +50,10 @@ const clientSchema = new mongoose.Schema(
       },
     },
     otp: {
-      type: String,
-      
+      type: String
     },
     otpExpiredat: {
-      type: Number,
-    
+      type: Number
     },
     isVerified: {
       type: Boolean,

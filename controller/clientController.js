@@ -9,11 +9,18 @@ const Brevo = require('@getbrevo/brevo')
 exports.signUp = async (req, res, next) => {
   const { firstName, surname, phoneNumber, email, password } = req.body
   try {
-    const existClient = await clientModel.findOne({ email: email.toLowerCase() })
+    const existClient = await clientModel.findOne({ email: email.toLowerCase() }) 
+    const existVenueOwner = await clientModel.findOne({ email: email.toLowerCase() }) 
 
     if (existClient) {
       return res.status(404).json({
-        message: 'Account already exists, log in to your account',
+        message: 'Account already exist as a client, log in to your account',
+      })
+    }
+
+    if (existVenueOwner) {
+      return res.status(404).json({
+        message: 'Account already exist as a venue owner, log in to your account',
       })
     }
 
@@ -36,7 +43,7 @@ exports.signUp = async (req, res, next) => {
       email,
       password: hashedPassword,
       otp: otp,
-      otpExpiredat: Date.now() + 1000 * 60,
+      otpExpiredat: Date.now() + 1000 * 60 * 2,
       profilePicture: {
         url: response.secure_url,
         publicId: response.public_id,
@@ -63,47 +70,102 @@ exports.signUp = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
-};
-
+}
 
 exports.fetch = async (req, res, next) => {
   try {
-    const client = await clientModel.find().select('-password -phoneNumber -isVerified -role -otp -otpExpiredat -__v')
-  
+    const client = await clientModel
+      .find()
+      .select('-password -phoneNumber -isVerified -role -otp -otpExpiredat -__v')
+
     res.status(200).json({
       message: 'Clients fetched',
-      data: client
+      data: client,
     })
   } catch (error) {
     next(error)
   }
-};
-
+}
 
 exports.getAclient = async (req, res, next) => {
   try {
-    const {id} = req.params;
-    const client = await clientModel.findById(id).select('-password -phoneNumber -isVerified -role -otp -otpExpiredat -__v')
-  
+    const { id } = req.params
+    const client = await clientModel
+      .findById(id)
+      .select('-password -phoneNumber -isVerified -role -otp -otpExpiredat -__v')
+
     if (!client) {
       return res.status(404).json(`Client with the ID: ${id} not found`)
     }
 
     res.status(200).json({
       message: 'Clients found',
-      data: client
+      data: client,
     })
   } catch (error) {
     next(error)
   }
-};
-
-
+}
 
 exports.updateClient = async (req, res, next) => {
   try {
-    
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (req.file) {
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'client_profiles',
+      });
+      updates.profilePicture = {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      };
+    }
+
+    delete updates.password;
+
+    const updatedClient = await clientModel.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true}
+    ).select('-password -otp -otpExpiredat -__v');
+
+    if (!updatedClient) {
+      return res.status(404).json({
+        message: 'Client not found',
+      });
+    }
+
+    res.status(200).json({
+      message: 'Client updated successfully',
+      data: updatedClient,
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
+exports.deleteClient = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const client = await clientModel.findById(id);
+    if (!client) {
+      return res.status(404).json({
+        message: 'Client not found',
+      });
+    }
+
+    if (client.profilePicture && client.profilePicture.publicId) {
+      await cloudinary.uploader.destroy(client.profilePicture.publicId);
+    }
+
+    await clientModel.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: 'Client deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
