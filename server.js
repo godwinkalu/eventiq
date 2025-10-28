@@ -47,13 +47,27 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:9000/api/v1',
+      url: 'http://localhost:5677/api/v1',
       description: 'Development server',
     },
     {
       url: 'https://eventiq.onrender.com',
       description: 'production server',
     }
+  ],
+   components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT', // you can paste your JWT token in Swagger UI
+      },
+    },
+  },
+  security: [
+    {
+      bearerAuth: [],
+    },
   ],
 }
 

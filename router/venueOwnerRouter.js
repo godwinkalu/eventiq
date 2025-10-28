@@ -4,12 +4,12 @@ const router = require('express').Router()
 
 /**
  * @swagger
- * /api/v1/venue-owner:
+ *  /venueOwner:
  *   post:
- *     summary: Register a new hall owner
- *     description: Creates a new hall owner account and sends a verification OTP to the provided email.
+ *     summary: Register a new venue owner
+ *     description: Creates a new venue owner account and sends a verification OTP to the provided email.
  *     tags:
- *       - Hall Owners
+ *       - venue Owners
  *     requestBody:
  *       required: true
  *       content:

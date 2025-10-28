@@ -20,7 +20,7 @@ exports.verify = async (req, res, next) => {
       })
     }
 
-    if (Date.now() > user.otpExpiredat) {
+    if (Date.now() >= user.otpExpiredat) {
       return res.status(400).json({
         message: 'Otp expired',
       })
