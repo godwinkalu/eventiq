@@ -29,7 +29,8 @@ exports.signUp = async (req, res, next) => {
       data: {
         firstName: newadmin.firstName,
         surname: newadmin.surname,
-        email: newadmin.email
+        email: newadmin.email,
+        id: newadmin._id
       }
     })
   } catch (error) {
@@ -83,7 +84,7 @@ exports.updateAdminInfo = async (req, res) => {
     const admin = await adminModel.findById(id)
     if (!admin) {
       return res.status(404).json({
-        message: 'Admin not found',
+        message: `Admin with the ID: ${id} not found`,
       })
     }
 
