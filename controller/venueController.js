@@ -55,38 +55,40 @@ exports.createVenue = async (req, res, next) => {
       state: state ? state.trim() : '',
     }
 
-    if (!files.length) {
+    let uploadedImages
+
+    if (files.length === 0) {
       return res.status(400).json({ message: 'At least one image is required' })
-    }
+    } else {
+      uploadedImages = []
+      for (const file of files) {
+        const cloudImage = await cloudinary.uploader.upload(file.path, {
+          folder: 'Event/Venues',
+          use_filename: true,
+          transformation: [{ width: 500, height: 250, crop: 'fill', gravity: 'auto' }],
+        })
 
-    const uploadedImages = []
-    for (const file of files) {
-      const cloudImage = await cloudinary.uploader.upload(file.path, {
-        folder: 'Event/Venues',
-        use_filename: true,
-        transformation: [{ width: 500, height: 250, crop: 'fill', gravity: 'auto' }],
-      })
+        uploadedImages.push({
+          url: cloudImage.secure_url,
+          publicId: cloudImage.public_id,
+        })
 
-      uploadedImages.push({
-        url: cloudImage.secure_url,
-        publicId: cloudImage.public_id,
-      })
-
-      fs.existsSync(file.path) && fs.unlinkSync(file.path)
+        fs.existsSync(file.path) && fs.unlinkSync(file.path)
+      }
     }
 
     const newVenue = new venueModel({
       venueOwnerId: venueOwner._id,
-      name: name?.trim(),
+      name,
       description,
       location,
-      capacity,
       price,
-      cautionfee,
       openhours,
       type,
+      cautionfee,
       amenities,
       image: uploadedImages,
+      capacity,
     })
 
     await newVenue.save()
@@ -199,74 +201,138 @@ exports.getAllVenues = async (req, res, next) => {
     res.status(200).json({
       message: 'All venues retrieved successfully',
       data: venues,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
-exports.getOnevenue = async(req,res,next)=>{
-   try {
-
-    const {id} = req.params
-   const venue = await venueModel.findById(id)
-   .populate('venueOwnerId', 'fullname email phoneNumber');
-   if (!venue) {
-      return res.status(404).json({ 
-        message: 'Venue not found' 
-      });
-      
+}
+exports.getOnevenue = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const venue = await venueModel.findById(id).populate('venueOwnerId', 'fullname email phoneNumber')
+    if (!venue) {
+      return res.status(404).json({
+        message: 'Venue not found',
+      })
     }
     res.status(200).json({
       message: 'Venue retrieved successfully',
       data: venue,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 exports.updateVenue = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-    const updatedData = req.body;
+  const files = req.files || []
 
-    const venue = await venueModel.findOne({ _id: id, venueOwnerId: userId });
+  const cleanupLocalFiles = (files) => {
+    for (const file of files) {
+      if (fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path)
+      }
+    }
+  }
+
+  try {
+    const { id } = req.params
+    const userId = req.user.id
+    const { description, price, openhours, type, cautionfee, amenities } = req.body
+ 
+    const venueOwner = await venueOwnerModel.findById(userId)
+    const venue = await venueModel.findById(id)
+    if (!venueOwner) {
+      if (files && Array.isArray(files)) cleanupLocalFiles(files)
+      return res.status(404).json({
+        message: 'Venue owner not found',
+      })
+    }
     if (!venue) {
-      return res.status(404).json({ 
-        message: 'Venue not found or not authorized' 
-      });
+      if (files && Array.isArray(files)) cleanupLocalFiles(files)
+      return res.status(404).json({
+        message: 'Venue not found',
+      })
     }
 
-  
-    const updatedVenue = await venueModel.findByIdAndUpdate(id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    let uploadedImages = venue.image  
+    let newUploadedImage;
+
+    if (files.length === 0) {
+      newUploadedImage = uploadedImages
+    } else {
+      newUploadedImage = []
+
+      for(const path of uploadedImages){
+        await cloudinary.uploader.destroy(path.publicId)
+      }
+
+      for (const file of files) {
+        const cloudImage = await cloudinary.uploader.upload(file.path, {
+          folder: 'Event/Venues',
+          use_filename: true,
+          transformation: [{ width: 500, height: 250, crop: 'fill', gravity: 'auto' }],
+        })
+
+        newUploadedImage.push({
+          url: cloudImage.secure_url,
+          publicId: cloudImage.public_id,
+        })
+
+        fs.existsSync(file.path) && fs.unlinkSync(file.path)
+      }
+    }
+
+    const data = {
+      description: description ?? venue.description,
+      price: price ?? venue.price,
+      openhours: openhours ?? venue.openhours,
+      type: type ?? venue.type,
+      cautionfee: cautionfee ?? venue.cautionfee,
+      amenities: amenities ?? venue.amenities,
+      image: newUploadedImage,
+    }
+
+    const updatedVenue = await venueModel.findByIdAndUpdate(venue._id, data, { new: true })
 
     res.status(200).json({
       message: 'Venue updated successfully',
       data: updatedVenue,
-    });
+    })
   } catch (error) {
-    next(error);
+    if (files && Array.isArray(files)) cleanupLocalFiles(files)
+    next(error)
   }
-};
+}
 
 exports.deleteVenue = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const userId = req.user.id;
+    const { id } = req.params
+    const userId = req.user.id
 
-    const venue = await venueModel.findOne({ _id: id, venueOwnerId: userId });
-    if (!venue) {
-      return res.status(404).json({ message: 'Venue not found or not authorized' });
+    const venueOwner = await venueOwnerModel.findById(userId)
+    const venue = await venueModel.findById(id)
+
+    if (!venueOwner) {
+      return res.status(404).json({ message: 'Venue owner not found' })
     }
 
-    await venueModel.findByIdAndDelete(id);
+    if (!venue) {
+      return res.status(404).json({ message: 'Venue not found' })
+    }
 
-    res.status(200).json({ message: 'Venue deleted successfully' });
+    const deleted = await venueModel.findByIdAndDelete(venue._id)
+
+    if (deleted) {
+      for(path of venue.image){
+        console.log(path);
+        
+        await cloudinary.uploader.destroy(path.publicId)
+      }
+    }
+
+    res.status(200).json({ message: 'Venue deleted successfully' })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

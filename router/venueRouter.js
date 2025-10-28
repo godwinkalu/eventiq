@@ -1,5 +1,13 @@
 const router = require('express').Router()
-const { createVenue, uploadCac, uploadDocument, getAllVenues, getOnevenue, updateVenue, deleteVenue } = require('../controller/venueController')
+const {
+  createVenue,
+  uploadCac,
+  uploadDocument,
+  getAllVenues,
+  getOnevenue,
+  updateVenue,
+  deleteVenue,
+} = require('../controller/venueController')
 const { authentication } = require('../middleware/authMiddleware')
 
 const upload = require('../middleware/multer')
@@ -130,7 +138,7 @@ router.post('/uploadCAC', authentication, upload.single('cac'), uploadCac)
  *       404:
  *         description: Venue or venue owner not found
  */
-router.post("/upload", authentication, upload.single('document'), uploadDocument)
+router.post('/upload', authentication, upload.single('document'), uploadDocument)
 
 /**
  * @swagger
@@ -143,7 +151,7 @@ router.post("/upload", authentication, upload.single('document'), uploadDocument
  *       200:
  *         description: List of all venues retrieved successfully
  */
-router.get('/all', getAllVenues);
+router.get('/all', getAllVenues)
 
 /**
  * @swagger
@@ -166,7 +174,7 @@ router.get('/all', getAllVenues);
  *         description: Venue not found
  */
 
-router.get('/getOneVenue/:id', getOnevenue);
+router.get('/getOneVenue/:id', getOnevenue)
 
 /**
  * @swagger
@@ -201,7 +209,7 @@ router.get('/getOneVenue/:id', getOnevenue);
  *       404:
  *         description: Venue not found or unauthorized
  */
-router.put('/updatedvenue/:id', authentication, updateVenue);
+router.put('/updatedvenue/:id', authentication, upload.array('image', 5), updateVenue)
 /**
  * @swagger
  * /venues/deletevenue/{id}:
@@ -224,7 +232,6 @@ router.put('/updatedvenue/:id', authentication, updateVenue);
  *       404:
  *         description: Venue not found or unauthorized
  */
-router.delete('/deletevenue/:id', authentication, deleteVenue);
+router.delete('/deletevenue/:id', authentication, deleteVenue)
 
-
-module.exports = router;
+module.exports = router
