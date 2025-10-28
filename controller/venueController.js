@@ -191,3 +191,82 @@ exports.uploadDocument = async (req, res, next) => {
     next(error)
   }
 }
+
+exports.getAllVenues = async (req, res, next) => {
+  try {
+    const venues = await venueModel.find()
+
+    res.status(200).json({
+      message: 'All venues retrieved successfully',
+      data: venues,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+exports.getOnevenue = async(req,res,next)=>{
+   try {
+
+    const {id} = req.params
+   const venue = await venueModel.findById(id)
+   .populate('venueOwnerId', 'fullname email phoneNumber');
+   if (!venue) {
+      return res.status(404).json({ 
+        message: 'Venue not found' 
+      });
+      
+    }
+    res.status(200).json({
+      message: 'Venue retrieved successfully',
+      data: venue,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateVenue = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const updatedData = req.body;
+
+    const venue = await venueModel.findOne({ _id: id, venueOwnerId: userId });
+    if (!venue) {
+      return res.status(404).json({ 
+        message: 'Venue not found or not authorized' 
+      });
+    }
+
+  
+    const updatedVenue = await venueModel.findByIdAndUpdate(id, updatedData, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      message: 'Venue updated successfully',
+      data: updatedVenue,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteVenue = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const venue = await venueModel.findOne({ _id: id, venueOwnerId: userId });
+    if (!venue) {
+      return res.status(404).json({ message: 'Venue not found or not authorized' });
+    }
+
+    await venueModel.findByIdAndDelete(id);
+
+    res.status(200).json({ message: 'Venue deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};

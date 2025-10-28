@@ -6,7 +6,7 @@ const { confirmedHtml, rejectedHtml } = require('../utils/confirmemailTemplate')
 
 exports.createvenuebooking = async (req, res, next) => {
   try {
-    const { date, notes, numberofguests } = req.body
+    const { date, numberofguests } = req.body
     const { venueId } = req.params
     const clientId = req.user.id
 
@@ -30,7 +30,7 @@ exports.createvenuebooking = async (req, res, next) => {
       clientId: client._id,
       venueId: venue._id,
       paymentstatus: 'paid',
-      bookingstatus: 'pending',
+      bookingstatus: 'accepted',
     })
 
     if (existingBooking) {
@@ -46,13 +46,12 @@ exports.createvenuebooking = async (req, res, next) => {
 
     //  Create booking
     const newBooking = new venuebookingModel({
-      venueId,
-      clientId,
+      venueId:venue._id,
+      clientId:client._id,
       venueOwnerId: venue.venueOwnerId,
       date,
       totalamount: totalAmount,
       servicecharge: serviceCharge,
-      notes,
       numberofguests,
     })
 
@@ -91,7 +90,7 @@ exports.getAllPendingBookings = async (req, res, next) => {
     const venueOwner = await venueOwnerModel.findById(req.user.id)
 
     if (!venueOwner) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'Venue owner not found',
       })
     }
@@ -109,13 +108,12 @@ exports.getAllPendingBookings = async (req, res, next) => {
     next(error)
   }
 }
-
 exports.getAllConfirmedBookings = async (req, res, next) => {
   try {
     const venueOwner = await venueOwnerModel.findById(req.user.id)
 
     if (!venueOwner) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'Venue owner not found',
       })
     }
@@ -144,13 +142,13 @@ exports.acceptedBooking = async (req, res) => {
     const client = await clientModel.findById(clientId)
 
     if (!venueOwner) {
-      res.status(404).json({
+     return res.status(404).json({
         message: 'venue owner not found',
       })
     }
 
     if (!client) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'client not found',
       })
     }
@@ -182,19 +180,19 @@ exports.rejectedBooking = async (req, res) => {
     const client = await clientModel.findById(clientId)
 
     if (!venueOwner) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'venue owner not found',
       })
     }
 
     if (!client) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'client not found',
       })
     }
 
     if (!reason) {
-         res.status(400).json({
+       return res.status(400).json({
         message: 'please input a reason',
       })
     }
