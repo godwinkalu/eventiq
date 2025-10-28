@@ -5,7 +5,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /register-client:
+ * api/v1/register-client:
  *   post:
  *     summary: Register a new client
  *     description: Creates a new client account, hashes the password, uploads a default profile image to Cloudinary, generates an OTP, sends a welcome email, and saves client information to the database.

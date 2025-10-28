@@ -8,7 +8,7 @@ const cors = require('cors')
 const app = express()
 
 app.use(express.json())
-app.use(cors())
+app.use(cors( {origin: '*'}))
 const clientRouter = require('./router/clientRouter');
 const adminRouter = require('./router/adminRouter')
 const generalRouter = require('./router/general')
@@ -50,6 +50,10 @@ const swaggerDefinition = {
       url: 'http://localhost:9000/api/v1',
       description: 'Development server',
     },
+    {
+      url: 'https://eventiq.onrender.com',
+      description: 'production server',
+    }
   ],
 }
 
