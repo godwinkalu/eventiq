@@ -45,7 +45,7 @@ exports.verify = async (req, res, next) => {
     })
 
     await user.save()
-    res.status(404).json({
+    res.status(200).json({
       message: 'User verified Successfully',
     })
   } catch (error) {
