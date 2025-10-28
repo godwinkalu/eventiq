@@ -235,7 +235,7 @@ router.get('/admin/:id', getOneAdmin);
  *                       type: string
  *                       example: precioussilver988@gmail.com
  *       404:
- *         description: Admin not found
+ *         description: Admin with the ID 671a32e4a84b9c5a70f9b2c7 not found
  *         content:
  *           application/json:
  *             schema:
@@ -260,16 +260,58 @@ router.get('/admin/:id', getOneAdmin);
  */
 router.put('/adminInfo/:id', updateAdminInfo);
 
+
 /**
  * @swagger
- * /deleteAdmin/:id:
+ * /deleteAdmin/{id}:
  *   delete:
- *     summary: Delete an admin,
- *     description: Delete an admin with the ID passed,
+ *     summary: Delete an admin
+ *     description: Deletes an admin account from the database using the provided admin ID.
  *     tags: [Admin]
- *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the admin to delete
+ *         schema:
+ *           type: string
+ *           example: 671a32e4a84b9c5a70f9b2c7
+ *     responses:
+ *       200:
+ *         description: Admin deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin deleted successfully
+ *       404:
+ *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin not found
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ *                 error:
+ *                   type: string
+ *                   example: "Cast to ObjectId failed for value 'abc' (type string)"
  */
-router.delete('/deleteAdmin/:id', deleteAdmin)
+router.delete('/deleteAdmin/:id', deleteAdmin);
 
 
 

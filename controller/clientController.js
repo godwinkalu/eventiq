@@ -53,7 +53,6 @@ exports.signUp = async (req, res, next) => {
     sendSmtpEmail.sender = { name: 'Eventiq', email: 'udumag51@gmail.com' }
 
     sendSmtpEmail.htmlContent = signUpTemplate(otp, client.firstName)
-    console.log(firstName)
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
     await client.save()
@@ -61,6 +60,49 @@ exports.signUp = async (req, res, next) => {
       message: 'Client created successfully',
       data: client,
     })
+  } catch (error) {
+    next(error)
+  }
+};
+
+
+exports.fetch = async (req, res, next) => {
+  try {
+    const client = await clientModel.find().select('-password -phoneNumber -isVerified -role -otp -otpExpiredat -__v')
+  
+    res.status(200).json({
+      message: 'Clients fetched',
+      data: client
+    })
+  } catch (error) {
+    next(error)
+  }
+};
+
+
+exports.getAclient = async (req, res, next) => {
+  try {
+    const {id} = req.params;
+    const client = await clientModel.findById(id).select('-password -phoneNumber -isVerified -role -otp -otpExpiredat -__v')
+  
+    if (!client) {
+      return res.status(404).json(`Client with the ID: ${id} not found`)
+    }
+
+    res.status(200).json({
+      message: 'Clients found',
+      data: client
+    })
+  } catch (error) {
+    next(error)
+  }
+};
+
+
+
+exports.updateClient = async (req, res, next) => {
+  try {
+    
   } catch (error) {
     next(error)
   }

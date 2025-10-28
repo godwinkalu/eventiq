@@ -274,8 +274,5 @@ const forgotPasswordTemplate = (verifyLink, firstName) => {
             </div>  
         </div>
     </body>
-    </html>
-    
-  
-    `
+    </html>`
 }
