@@ -90,7 +90,7 @@ exports.getAllPendingBookings = async (req, res, next) => {
     const venueOwner = await venueOwnerModel.findById(req.user.id)
 
     if (!venueOwner) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'Venue owner not found',
       })
     }
@@ -113,7 +113,7 @@ exports.getAllConfirmedBookings = async (req, res, next) => {
     const venueOwner = await venueOwnerModel.findById(req.user.id)
 
     if (!venueOwner) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'Venue owner not found',
       })
     }
@@ -142,13 +142,13 @@ exports.acceptedBooking = async (req, res) => {
     const client = await clientModel.findById(clientId)
 
     if (!venueOwner) {
-      res.status(404).json({
+     return res.status(404).json({
         message: 'venue owner not found',
       })
     }
 
     if (!client) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'client not found',
       })
     }
@@ -180,19 +180,19 @@ exports.rejectedBooking = async (req, res) => {
     const client = await clientModel.findById(clientId)
 
     if (!venueOwner) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'venue owner not found',
       })
     }
 
     if (!client) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'client not found',
       })
     }
 
     if (!reason) {
-         res.status(400).json({
+       return res.status(400).json({
         message: 'please input a reason',
       })
     }
