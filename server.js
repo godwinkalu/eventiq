@@ -47,7 +47,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'https://eventiq.onrender.com',
+      url: 'https://eventiq.onrender.com/api/v1',
       description: 'production server',
     },
     {
