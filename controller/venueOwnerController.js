@@ -9,10 +9,17 @@ exports.createVenueOwner = async (req, res, next) => {
   const { firstName, surname, businessName, email, password, phoneNumber } = req.body
   try {
     const existVenueOwner = await venueOwnerModel.findOne({ email: email.toLowerCase() })
+     const existClient  =    await     venueOwnerModel.findOne({ email: email.toLowerCase() })
 
     if (existVenueOwner) {
       return res.status(404).json({
         message: 'Account already exists, login your account',
+      })
+    }
+
+     if (existClient) {
+      return res.status(404).json({
+        message: 'Account already exist as a client, log in to your account',
       })
     }
     const salt = await bcrypt.genSalt(10)
@@ -78,7 +85,7 @@ exports.getAllVenueOwners = async (req, res, next) => {
   }
 };
 
-exports.getVenueOwnerById = async (req, res, next) => {
+exports.getVenueOwners = async (req, res, next) => {
   try {
     const { id } = req.params;
     const owner = await venueOwnerModel.findById(id).select('-password -otp');

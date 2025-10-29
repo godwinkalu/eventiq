@@ -49,7 +49,7 @@ const router = express.Router();
  *       404:
  *         description: Client or booking not found
  */
-router.post('notification/', authentication, createNotification);
+router.post('/notification/', authentication, createNotification);
 
 /**
  * @swagger
@@ -65,7 +65,7 @@ router.post('notification/', authentication, createNotification);
  *       404:
  *         description: Notifications not found
  */
-router.get('getclient/', authentication, getClientNotifications);
+router.get('/getclient/', authentication, getClientNotifications);
 
 /**
  * @swagger
@@ -88,7 +88,7 @@ router.get('getclient/', authentication, getClientNotifications);
  *       404:
  *         description: Notification not found
  */
-router.patch('markeasread/:id/read', authentication, markAsRead);
+router.patch('/markeasread/:id/read', authentication, markAsRead);
 
 /**
  * @swagger
@@ -111,6 +111,6 @@ router.patch('markeasread/:id/read', authentication, markAsRead);
  *       404:
  *         description: Notification not found
  */
-router.delete('delete/:id', authentication, deleteNotification);
+router.delete('/delete/:id', authentication, deleteNotification);
 
 module.exports = router;

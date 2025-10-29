@@ -1,6 +1,7 @@
-const { createVenueOwner } = require("../controller/venueOwnerController")
+const { createVenueOwner, getAllVenueOwners, getVenueOwner, getVenueOwners, updateVenueOwner, deleteVenueOwner } = require("../controller/venueOwnerController")
 
 const router = require('express').Router()
+const upload = require('../middleware/multer')
 
 /**
  * @swagger
@@ -98,4 +99,106 @@ const router = require('express').Router()
  */
 router.post('/venueOwner', createVenueOwner)
 
+/**
+ * @swagger
+ * /venueowners:
+ *   get:
+ *     summary: Get all venue owners
+ *     tags: [VenueOwner]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all venue owners retrieved successfully
+ *       500:
+ *         description: Server error
+ */
+router.get('/getallvenue',  getAllVenueOwners);
+
+/**
+ * @swagger
+ * /venueowners/{id}:
+ *   get:
+ *     summary: Get a single venue owner by ID
+ *     tags: [VenueOwner]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Venue owner ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Venue owner retrieved successfully
+ *       404:
+ *         description: Venue owner not found
+ */
+router.get('/getvenue/:id',  getVenueOwners);
+
+/**
+ * @swagger
+ * /venueowners/{id}:
+ *   patch:
+ *     summary: Update a venue owner
+ *     tags: [VenueOwner]
+ *     security:
+ *       - bearerAuth: []
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Venue owner ID
+ *         schema:
+ *           type: string
+ *       - in: formData
+ *         name: profilePicture
+ *         type: file
+ *         description: Upload new profile picture
+ *       - in: formData
+ *         name: firstName
+ *         type: string
+ *       - in: formData
+ *         name: surname
+ *         type: string
+ *       - in: formData
+ *         name: businessName
+ *         type: string
+ *       - in: formData
+ *         name: phoneNumber
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Venue owner updated successfully
+ *       404:
+ *         description: Venue owner not found
+ */
+router.put('/updateVenue/:id', upload.single('profilePicture'), updateVenueOwner);
+
+/**
+ * @swagger
+ * /venueowners/{id}:
+ *   delete:
+ *     summary: Delete a venue owner
+ *     tags: [VenueOwner]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Venue owner ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Venue owner deleted successfully
+ *       404:
+ *         description: Venue owner not found
+ */
+router.delete('/delete/:id',  deleteVenueOwner);
 module.exports = router
