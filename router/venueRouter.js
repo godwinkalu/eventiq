@@ -21,7 +21,7 @@ const upload = require('../middleware/multer')
 
 /**
  * @swagger
- * /venues/list-venue:
+ * /list-venue:
  *   post:
  *     summary: Create a new venue
  *     description: Allows a verified venue owner to list a new venue with images.
