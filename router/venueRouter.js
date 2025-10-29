@@ -151,11 +151,11 @@ router.post('/upload', authentication, upload.single('document'), uploadDocument
  *       200:
  *         description: List of all venues retrieved successfully
  */
-router.get('/all', getAllVenues)
+router.get('/allvenues', getAllVenues)
 
 /**
  * @swagger
- * /api/v1/venues/getOneVenue/{id}:
+ * /venues/getOneVenue/{id}:
  *   get:
  *     summary: Get one venue by ID
  *     description: Retrieve details of a specific venue.

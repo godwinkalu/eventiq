@@ -1,7 +1,7 @@
-const {signUp, fetch, getAclient} = require('../controller/clientController')
+const {signUp, fetch, getAclient, updateClient, deleteClient} = require('../controller/clientController')
 
 const router = require('express').Router();
-
+const upload = require('../middleware/multer')
 
 /**
  * @swagger
@@ -231,5 +231,65 @@ router.get('/clients', fetch);
  */
 router.get('/client/:id', getAclient);
 
+/**
+ * @swagger
+ * /clients/{id}:
+ *   patch:
+ *     summary: Update a client profile
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Client ID
+ *         schema:
+ *           type: string
+ *       - in: formData
+ *         name: profilePicture
+ *         type: file
+ *         description: Upload a new profile picture
+ *       - in: formData
+ *         name: firstName
+ *         type: string
+ *       - in: formData
+ *         name: surname
+ *         type: string
+ *       - in: formData
+ *         name: phoneNumber
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Client updated successfully
+ *       404:
+ *         description: Client not found
+ */
+router.patch('/updateclient/:id',  upload.single('profilePicture'), updateClient);
+
+/**
+ * @swagger
+ * /api/v1/clients/{id}:
+ *   delete:
+ *     summary: Delete a client
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Client ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Client deleted successfully
+ *       404:
+ *         description: Client not found
+ */
+router.delete('/delete/:id', deleteClient);
 
 module.exports = router
