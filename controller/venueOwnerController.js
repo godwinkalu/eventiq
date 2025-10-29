@@ -6,7 +6,7 @@ const { emailSender } = require('../middleware/nodemalier')
 const Brevo = require('@getbrevo/brevo')
 
 exports.createVenueOwner = async (req, res, next) => {
-  const { firstName, surname, businessName, email, password, phoneNumber } = req.body
+  const { firstName, surname,  email, password, phoneNumber } = req.body
   try {
     const existVenueOwner = await venueOwnerModel.findOne({ email: email.toLowerCase() })
      const existClient  =    await     venueOwnerModel.findOne({ email: email.toLowerCase() })
@@ -37,7 +37,6 @@ exports.createVenueOwner = async (req, res, next) => {
     const venueOwner = new venueOwnerModel({
       firstName,
       surname,
-      businessName,
       email,
       phoneNumber,
       password: hashedPassword,
