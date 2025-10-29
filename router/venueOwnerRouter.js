@@ -3,57 +3,50 @@ const { createVenueOwner, getAllVenueOwners, getVenueOwner, getVenueOwners, upda
 const router = require('express').Router()
 const upload = require('../middleware/multer')
 
+
+
+
 /**
  * @swagger
- *  /venueOwner:
+ * /venueOwner:
  *   post:
- *     summary: Register a new venue owner
- *     description: Creates a new venue owner account and sends a verification OTP to the provided email.
+ *     summary: Create a new venue owner
+ *     description: Registers a new venue owner. The system checks if the email already exists, hashes the password, generates an OTP, uploads a default profile image to Cloudinary, and sends a verification email via Brevo.
  *     tags:
- *       - venue Owners
+ *       - Venue Owners
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
  *               - firstName
  *               - surname
- *               - businessName
  *               - email
  *               - password
  *               - phoneNumber
  *             properties:
  *               firstName:
  *                 type: string
- *                 description: The hall owner's first name
- *                 example: Godwin
+ *                 example: John
  *               surname:
  *                 type: string
- *                 description: The hall owner's surname
- *                 example: Uduma
- *               businessName:
- *                 type: string
- *                 description: The name of the hall owner's business
- *                 example: Royal Event Center
+ *                 example: Doe
  *               email:
  *                 type: string
  *                 format: email
- *                 description: The hall owner's email address
- *                 example: kalugodwin158@gmail.com
+ *                 example: johndoe@example.com
  *               password:
  *                 type: string
  *                 format: password
- *                 description: The hall owner's password
- *                 example: MySecurePass123
+ *                 example: StrongPass123
  *               phoneNumber:
  *                 type: string
- *                 description: The hall owner's phone number
- *                 example: 09056345749
+ *                 example: "08123456789"
  *     responses:
  *       201:
- *         description: Hall owner created successfully
+ *         description: Venue owner created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -61,31 +54,43 @@ const upload = require('../middleware/multer')
  *               properties:
  *                 message:
  *                   type: string
- *                   example: hallOwner created successfully
+ *                   example: venueOwner created successfully
  *                 data:
  *                   type: object
  *                   properties:
- *                     id:
+ *                     _id:
  *                       type: string
- *                       description: The hall owner's ID
- *                       example: 83e3a1fe8d9ab7ff15abac23
+ *                       example: 671b1a0af2d1caa5678ef901
  *                     firstName:
  *                       type: string
- *                       example: Godwin
+ *                       example: John
  *                     surname:
  *                       type: string
- *                       example: Uduma
- *                     businessName:
- *                       type: string
- *                       example: Royal Event Center
+ *                       example: Doe
  *                     email:
  *                       type: string
- *                       example: kalugodwin158@gmail.com
+ *                       example: johndoe@example.com
  *                     phoneNumber:
  *                       type: string
- *                       example: 09056345749
+ *                       example: "08123456789"
+ *                     otp:
+ *                       type: string
+ *                       example: "123456"
+ *                     otpExpiredat:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-10-29T11:00:00Z
+ *                     profilePicture:
+ *                       type: object
+ *                       properties:
+ *                         url:
+ *                           type: string
+ *                           example: https://res.cloudinary.com/yourcloud/image/upload/v12345/default.jpg
+ *                         publicId:
+ *                           type: string
+ *                           example: profile_abc123
  *       404:
- *         description: Hall owner already exists
+ *         description: Account already exists (as client or venue owner)
  *         content:
  *           application/json:
  *             schema:
@@ -93,10 +98,22 @@ const upload = require('../middleware/multer')
  *               properties:
  *                 message:
  *                   type: string
- *                   example: hallOwner already exists, log in to your account
+ *                   example: Account already exists, login your account
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
  */
+
+
+
+
 router.post('/venueOwner', createVenueOwner)
 
 /**
