@@ -47,12 +47,12 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:5677/api/v1',
-      description: 'Development server',
+      url: 'https://eventiq.onrender.com/api/v1',
+      description: 'production server',
     },
     {
-      url: 'https://eventiq.onrender.com',
-      description: 'production server',
+      url: 'http://localhost:5677/api/v1',
+      description: 'Development server',
     }
   ],
    components: {
